@@ -2,13 +2,13 @@
 import pyrebase
 
 firebaseConfig = {
-    "apiKey": "AIzaSyD5l6ZiWTMDqoA7zqzSrqgQ_7uMCJAW9sM",
-    "authDomain": "medscore-assist.firebaseapp.com",
-    "databaseURL": "https://medscore-assist-default-rtdb.asia-southeast1.firebasedatabase.app/",  # Provide if using Realtime DB; else leave blank
-    "projectId": "medscore-assist",
-    "storageBucket": "medscore-assist.firebasestorage.app",
-    "messagingSenderId": "207857923434",
-    "appId": "1:207857923434:web:a89b72e7ce45e36f9d2113"
+    "apiKey": "your-real-client-id",
+    "authDomain": "your-real-client-id",
+    "databaseURL": "your-real-client-id",  # Provide if using Realtime DB; else leave blank
+    "projectId": "your-real-client-id",
+    "storageBucket": "your-real-client-id",
+    "messagingSenderId": "your-real-client-id",
+    "appId": "your-real-client-id"
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
