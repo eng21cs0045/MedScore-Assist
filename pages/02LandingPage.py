@@ -397,7 +397,7 @@ col1, col2, col3 = st.columns([1, 1, 1], gap="large")
 columns = [col1, col2, col3]
 
 # Define the base directory
-BASE_DIR = r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final"
+BASE_DIR = r"."
 
 # Display each model in its column
 for i, model in enumerate(models_data):
