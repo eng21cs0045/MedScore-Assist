@@ -35,7 +35,7 @@ st.markdown(
     unsafe_allow_html=True)
 
 # ─── Configuration ─────────────────────────────────────────────────────────────
-REPORTS_FOLDER = r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\reports"
+REPORTS_FOLDER = r"reports"
 os.makedirs(REPORTS_FOLDER, exist_ok=True)
 
 # ─── Helper ────────────────────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ def my_reports_page():
 
 # ─── Back Button ────────────────────────────────────────────────────────────────
 if st.button("⬅️ Back to Home"):
-    st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+    st.switch_page(r"pages/02LandingPage.py")
 
 # ─── Run ────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
