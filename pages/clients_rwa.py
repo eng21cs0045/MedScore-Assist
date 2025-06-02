@@ -63,8 +63,11 @@ with col2:
     st.markdown("<h1 style='text-align: center; font-weight: bold;'>MEDSCORE ASSIST</h1>", unsafe_allow_html=True)
 
 st.markdown("<h2 style='text-align: center;'>🏘️ RWA Partners</h2>", unsafe_allow_html=True)
-st.write("We collaborate with Resident Welfare Associations (RWAs) to promote healthy living environments through proactive health services.")
-
+st.markdown("""
+<div style="text-align: center; font-size: 30px; margin-bottom: 40px;">
+    We collaborate with Resident Welfare Associations (RWAs) to promote healthy living environments through proactive health services.
+</div>
+""", unsafe_allow_html=True)
 st.markdown("<h3 style='color: #00ae99;'>Active RWAs:</h3>", unsafe_allow_html=True)
 
 rwa_data = [
