@@ -74,4 +74,4 @@ if st.button("Submit"):
         st.warning("⚠️ Please fill in all fields before submitting.")
 # 🡐 Back Button to go to main_app.py
 if st.button("⬅️ Back to Home"):
-    st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+    st.switch_page(r"pages/02LandingPage.py")
