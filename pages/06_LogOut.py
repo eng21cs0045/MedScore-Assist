@@ -9,7 +9,7 @@ def handle_logout():
     time.sleep(1)
     
     # Redirect to Login/Register page using the correct file path
-    st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\01LoginRegister.py")
+    st.switch_page(r"pages/01LoginRegister.py")
 def main():
     st.title("Logging Out")
     # Inform user about logout process
