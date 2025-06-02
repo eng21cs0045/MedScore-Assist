@@ -418,25 +418,58 @@ def get_email_from_google_token(access_token):
     except Exception:
         return None
 
-# Function to check if email exists in Firebase
+# FIXED: Improved email existence check
 def email_exists(email):
+    """Check if email exists in Firebase Auth using a more reliable method"""
     if not email:
         return False
-        
+    
     try:
-        # Try signing in with a dummy password to check if email exists
-        auth.sign_in_with_email_and_password(email, "dummy_password_123")
+        # Use Firebase Auth REST API to check if email exists
+        url = f"https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key={FIREBASE_API_KEY}"
+        payload = {
+            "identifier": email,
+            "continueUri": "http://localhost:8501"
+        }
+        
+        response = requests.post(url, json=payload)
+        
+        if response.status_code == 200:
+            data = response.json()
+            # If 'registered' key exists and is True, email is registered
+            return data.get('registered', False)
+        else:
+            # Fallback: try the old method
+            return email_exists_fallback(email)
+            
+    except Exception as e:
+        print(f"Error checking email existence: {e}")
+        # Fallback method
+        return email_exists_fallback(email)
+
+def email_exists_fallback(email):
+    """Fallback method to check email existence"""
+    try:
+        # Try to sign in with a dummy password
+        auth.sign_in_with_email_and_password(email, "dummy_password_that_wont_work_123456")
         return True
     except Exception as e:
-        error_message = str(e)
-        if "INVALID_PASSWORD" in error_message:
+        error_message = str(e).upper()
+        if "INVALID_PASSWORD" in error_message or "WRONG_PASSWORD" in error_message:
+            return True  # Email exists but password is wrong
+        elif "EMAIL_NOT_FOUND" in error_message or "USER_NOT_FOUND" in error_message:
+            return False  # Email doesn't exist
+        elif "INVALID_LOGIN_CREDENTIALS" in error_message:
+            # This could mean either email doesn't exist OR password is wrong
+            # Let's be more conservative and assume it exists
             return True
-        elif "EMAIL_NOT_FOUND" in error_message or "INVALID_LOGIN_CREDENTIALS" in error_message:
+        else:
+            print(f"Unexpected error in email_exists_fallback: {error_message}")
             return False
-        return False
 
-# Function to attempt direct login with email and password
+# FIXED: Improved login function with better error handling
 def attempt_direct_login(email, password):
+    """Attempt to login with email and password"""
     if not email or not password:
         return None, "Please enter both email and password."
     
@@ -444,13 +477,21 @@ def attempt_direct_login(email, password):
         user = auth.sign_in_with_email_and_password(email, password)
         return user, None
     except Exception as e:
-        error_message = str(e)
-        if "INVALID_PASSWORD" in error_message:
+        error_message = str(e).upper()
+        
+        if "INVALID_PASSWORD" in error_message or "WRONG_PASSWORD" in error_message:
             return None, "Invalid password. Please try again."
-        elif "INVALID_LOGIN_CREDENTIALS" in error_message or "EMAIL_NOT_FOUND" in error_message:
+        elif "EMAIL_NOT_FOUND" in error_message or "USER_NOT_FOUND" in error_message:
             return None, "Email is not registered. Please register first."
+        elif "INVALID_LOGIN_CREDENTIALS" in error_message:
+            return None, "Invalid email or password. Please check your credentials."
+        elif "TOO_MANY_ATTEMPTS_TRY_LATER" in error_message:
+            return None, "Too many failed attempts. Please try again later."
+        elif "USER_DISABLED" in error_message:
+            return None, "This account has been disabled. Please contact support."
         else:
-            return None, f"Login failed: {error_message}"
+            print(f"Login error: {error_message}")
+            return None, "Login failed. Please try again."
 
 # Function to register new user
 def register_new_user(email, password):
@@ -458,6 +499,7 @@ def register_new_user(email, password):
         return None, "Please provide both email and password."
     
     try:
+        # Check if email already exists first
         if email_exists(email):
             return None, "Email already registered. Please login instead."
         
@@ -475,11 +517,16 @@ def register_new_user(email, password):
         
         return user, None
     except Exception as e:
-        error_message = str(e)
+        error_message = str(e).upper()
         if "EMAIL_EXISTS" in error_message:
             return None, "Email already registered. Please login instead."
+        elif "WEAK_PASSWORD" in error_message:
+            return None, "Password is too weak. Please use at least 6 characters."
+        elif "INVALID_EMAIL" in error_message:
+            return None, "Invalid email format. Please enter a valid email."
         else:
-            return None, f"Registration failed: {error_message}"
+            print(f"Registration error: {error_message}")
+            return None, "Registration failed. Please try again."
 
 # Function to clear session state
 def clear_session_state():
@@ -610,11 +657,13 @@ def main():
 
             if login_submitted:
                 if email and password:
-                    user, error_message = attempt_direct_login(email, password)
+                    with st.spinner("Logging you in..."):
+                        user, error_message = attempt_direct_login(email, password)
                     
                     if user:
                         st.session_state.user = user
                         st.success("✅ Login successful!")
+                        time.sleep(1)  # Brief pause to show success message
                         st.rerun()
                     else:
                         st.session_state.error_message = error_message
@@ -655,7 +704,8 @@ def main():
                     st.session_state.error_message = "Password must be at least 6 characters long."
                     st.rerun()
                 else:
-                    user, error_message = register_new_user(new_email, new_password)
+                    with st.spinner("Creating your account..."):
+                        user, error_message = register_new_user(new_email, new_password)
                     
                     if user:
                         st.success("✅ Registration successful! Please log in now.")
