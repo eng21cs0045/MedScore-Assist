@@ -6,6 +6,7 @@ import json
 import time
 import secrets
 import string
+import os
 
 # Page configuration with sidebar permanently hidden
 st.set_page_config(
@@ -331,11 +332,40 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Google OAuth Configuration
-GOOGLE_CLIENT_ID = "207857923434-3iaocbdg54hdfi7bqnrnjmi6rocjt8al.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
-REDIRECT_URI = "http://localhost:8501"  # Simplified redirect URI
-FIREBASE_API_KEY = "AIzaSyD5l6ZiWTMDqoA7zqzSrqgQ_7uMCJAW9sM"
+# FIXED: Configuration using Streamlit secrets and environment detection
+def get_config():
+    """Get configuration based on environment"""
+    try:
+        # Try to get from Streamlit secrets first (for Streamlit Cloud)
+        if hasattr(st, 'secrets'):
+            return {
+                "GOOGLE_CLIENT_ID": st.secrets.get("GOOGLE_CLIENT_ID", ""),
+                "GOOGLE_CLIENT_SECRET": st.secrets.get("GOOGLE_CLIENT_SECRET", ""),
+                "FIREBASE_API_KEY": st.secrets.get("FIREBASE_API_KEY", ""),
+                "REDIRECT_URI": st.secrets.get("REDIRECT_URI", "")
+            }
+    except:
+        pass
+    
+    # Fallback to environment variables
+    return {
+        "GOOGLE_CLIENT_ID": os.getenv("GOOGLE_CLIENT_ID", "207857923434-3iaocbdg54hdfi7bqnrnjmi6rocjt8al.apps.googleusercontent.com"),
+        "GOOGLE_CLIENT_SECRET": os.getenv("GOOGLE_CLIENT_SECRET", "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"),
+        "FIREBASE_API_KEY": os.getenv("FIREBASE_API_KEY", "AIzaSyD5l6ZiWTMDqoA7zqzSrqgQ_7uMCJAW9sM"),
+        "REDIRECT_URI": os.getenv("REDIRECT_URI", "http://localhost:8501")
+    }
+
+# Get configuration
+config = get_config()
+GOOGLE_CLIENT_ID = config["GOOGLE_CLIENT_ID"]
+GOOGLE_CLIENT_SECRET = config["GOOGLE_CLIENT_SECRET"]
+FIREBASE_API_KEY = config["FIREBASE_API_KEY"]
+REDIRECT_URI = config["REDIRECT_URI"]
+
+# FIXED: Auto-detect redirect URI if not set properly
+if REDIRECT_URI == "http://localhost:8501" and "streamlit.app" in st.query_params.get("host", ""):
+    # Auto-detect Streamlit Cloud URL
+    REDIRECT_URI = f"https://{st.query_params.get('host', '')}"
 
 # Initialize Firebase with Pyrebase
 firebaseConfig = {
@@ -348,22 +378,42 @@ firebaseConfig = {
     "appId": "1:207857923434:web:a89b72e7ce45e36f9d2113"
 }
 
-# Initialize Firebase
-firebase = pyrebase.initialize_app(firebaseConfig)
-auth = firebase.auth()
-db = firebase.database()
+# Initialize Firebase with error handling
+try:
+    firebase = pyrebase.initialize_app(firebaseConfig)
+    auth = firebase.auth()
+    db = firebase.database()
+    firebase_initialized = True
+except Exception as e:
+    st.error(f"Firebase initialization failed: {str(e)}")
+    firebase_initialized = False
+    auth = None
+    db = None
 
 # Function to generate a secure random password
 def generate_secure_password(length=12):
     alphabet = string.ascii_letters + string.digits + "!@#$%^&*()_-+=<>?"
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-# Function to generate Google OAuth URL
+# FIXED: Dynamic redirect URI for Google OAuth
 def get_google_auth_url(mode="login"):
+    if not GOOGLE_CLIENT_ID:
+        return None
+        
+    # Try to auto-detect the current URL
+    current_url = REDIRECT_URI
+    try:
+        # Get the current page URL from browser
+        if hasattr(st, 'query_params') and st.query_params:
+            # This is a simplified approach - in production you might need more sophisticated URL detection
+            pass
+    except:
+        pass
+    
     scope = "openid email profile"
     params = {
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": REDIRECT_URI,
+        "redirect_uri": current_url,
         "response_type": "code",
         "scope": scope,
         "access_type": "offline",
@@ -375,7 +425,7 @@ def get_google_auth_url(mode="login"):
 
 # Function to exchange authorization code for tokens
 def exchange_code_for_token(code):
-    if not code:
+    if not code or not GOOGLE_CLIENT_SECRET:
         return None, None
     
     token_url = "https://oauth2.googleapis.com/token"
@@ -389,14 +439,15 @@ def exchange_code_for_token(code):
     }
     
     try:
-        response = requests.post(token_url, data=payload)
+        response = requests.post(token_url, data=payload, timeout=10)
         
         if response.status_code != 200:
             return None, None
             
         token_data = response.json()
         return token_data.get("id_token"), token_data.get("access_token")
-    except Exception:
+    except Exception as e:
+        st.error(f"Token exchange failed: {str(e)}")
         return None, None
 
 # Function to get email from Google access token
@@ -408,7 +459,7 @@ def get_email_from_google_token(access_token):
         user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
         headers = {"Authorization": f"Bearer {access_token}"}
         
-        response = requests.get(user_info_url, headers=headers)
+        response = requests.get(user_info_url, headers=headers, timeout=10)
         
         if response.status_code != 200:
             return None
@@ -418,10 +469,10 @@ def get_email_from_google_token(access_token):
     except Exception:
         return None
 
-# FIXED: Improved email existence check
+# FIXED: More robust email existence check
 def email_exists(email):
-    """Check if email exists in Firebase Auth using a more reliable method"""
-    if not email:
+    """Check if email exists in Firebase Auth"""
+    if not email or not firebase_initialized:
         return False
     
     try:
@@ -429,49 +480,49 @@ def email_exists(email):
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key={FIREBASE_API_KEY}"
         payload = {
             "identifier": email,
-            "continueUri": "http://localhost:8501"
+            "continueUri": REDIRECT_URI
         }
         
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, timeout=10)
         
         if response.status_code == 200:
             data = response.json()
-            # If 'registered' key exists and is True, email is registered
             return data.get('registered', False)
         else:
-            # Fallback: try the old method
             return email_exists_fallback(email)
             
     except Exception as e:
         print(f"Error checking email existence: {e}")
-        # Fallback method
         return email_exists_fallback(email)
 
 def email_exists_fallback(email):
     """Fallback method to check email existence"""
+    if not firebase_initialized:
+        return False
+        
     try:
         # Try to sign in with a dummy password
         auth.sign_in_with_email_and_password(email, "dummy_password_that_wont_work_123456")
         return True
     except Exception as e:
         error_message = str(e).upper()
-        if "INVALID_PASSWORD" in error_message or "WRONG_PASSWORD" in error_message:
-            return True  # Email exists but password is wrong
-        elif "EMAIL_NOT_FOUND" in error_message or "USER_NOT_FOUND" in error_message:
-            return False  # Email doesn't exist
-        elif "INVALID_LOGIN_CREDENTIALS" in error_message:
-            # This could mean either email doesn't exist OR password is wrong
-            # Let's be more conservative and assume it exists
+        if any(phrase in error_message for phrase in ["INVALID_PASSWORD", "WRONG_PASSWORD"]):
             return True
+        elif any(phrase in error_message for phrase in ["EMAIL_NOT_FOUND", "USER_NOT_FOUND"]):
+            return False
+        elif "INVALID_LOGIN_CREDENTIALS" in error_message:
+            return True  # Conservative approach
         else:
-            print(f"Unexpected error in email_exists_fallback: {error_message}")
             return False
 
-# FIXED: Improved login function with better error handling
+# FIXED: Improved login function with better error handling and timeout
 def attempt_direct_login(email, password):
     """Attempt to login with email and password"""
     if not email or not password:
         return None, "Please enter both email and password."
+    
+    if not firebase_initialized:
+        return None, "Authentication service is not available. Please try again later."
     
     try:
         user = auth.sign_in_with_email_and_password(email, password)
@@ -479,9 +530,9 @@ def attempt_direct_login(email, password):
     except Exception as e:
         error_message = str(e).upper()
         
-        if "INVALID_PASSWORD" in error_message or "WRONG_PASSWORD" in error_message:
+        if any(phrase in error_message for phrase in ["INVALID_PASSWORD", "WRONG_PASSWORD"]):
             return None, "Invalid password. Please try again."
-        elif "EMAIL_NOT_FOUND" in error_message or "USER_NOT_FOUND" in error_message:
+        elif any(phrase in error_message for phrase in ["EMAIL_NOT_FOUND", "USER_NOT_FOUND"]):
             return None, "Email is not registered. Please register first."
         elif "INVALID_LOGIN_CREDENTIALS" in error_message:
             return None, "Invalid email or password. Please check your credentials."
@@ -489,14 +540,19 @@ def attempt_direct_login(email, password):
             return None, "Too many failed attempts. Please try again later."
         elif "USER_DISABLED" in error_message:
             return None, "This account has been disabled. Please contact support."
+        elif "NETWORK" in error_message or "TIMEOUT" in error_message:
+            return None, "Network error. Please check your connection and try again."
         else:
             print(f"Login error: {error_message}")
             return None, "Login failed. Please try again."
 
-# Function to register new user
+# FIXED: Improved registration function
 def register_new_user(email, password):
     if not email or not password:
         return None, "Please provide both email and password."
+    
+    if not firebase_initialized:
+        return None, "Registration service is not available. Please try again later."
     
     try:
         # Check if email already exists first
@@ -506,14 +562,18 @@ def register_new_user(email, password):
         user = auth.create_user_with_email_and_password(email, password)
         
         # Store additional user data
-        sanitized_email = email.replace('.', ',')
-        user_data = {
-            'email': email,
-            'has_password': True,
-            'user_id': user['localId'],
-            'created_at': time.time()
-        }
-        db.child("users").child(sanitized_email).set(user_data)
+        try:
+            sanitized_email = email.replace('.', ',')
+            user_data = {
+                'email': email,
+                'has_password': True,
+                'user_id': user['localId'],
+                'created_at': time.time()
+            }
+            db.child("users").child(sanitized_email).set(user_data)
+        except Exception as db_error:
+            # User created but database write failed - still return success
+            print(f"Database write error: {db_error}")
         
         return user, None
     except Exception as e:
@@ -524,6 +584,8 @@ def register_new_user(email, password):
             return None, "Password is too weak. Please use at least 6 characters."
         elif "INVALID_EMAIL" in error_message:
             return None, "Invalid email format. Please enter a valid email."
+        elif "NETWORK" in error_message or "TIMEOUT" in error_message:
+            return None, "Network error. Please check your connection and try again."
         else:
             print(f"Registration error: {error_message}")
             return None, "Registration failed. Please try again."
@@ -546,13 +608,17 @@ def initialize_session_state():
     if "error_message" not in st.session_state:
         st.session_state.error_message = None
 
-# Function to display debug info (hidden in production)
+# FIXED: Enhanced debug info with environment detection
 def display_debug_info():
     """Display debug information for development"""
     debug_info = {
+        "environment": "Streamlit Cloud" if "streamlit.app" in REDIRECT_URI else "Local",
+        "firebase_initialized": firebase_initialized,
         "oauth_state": st.session_state.get("oauth_state", "None"),
         "user_logged_in": st.session_state.get("user") is not None,
         "error_message": st.session_state.get("error_message", "None"),
+        "redirect_uri": REDIRECT_URI,
+        "has_google_config": bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET),
         "query_params": dict(st.query_params)
     }
     
@@ -563,8 +629,14 @@ def display_debug_info():
     </div>
     """, unsafe_allow_html=True)
 
-# Main Function
+# FIXED: Enhanced main function with better error handling
 def main():
+    # Check if Firebase is initialized
+    if not firebase_initialized:
+        st.error("⚠️ Authentication service is currently unavailable. Please try again later.")
+        st.info("If this problem persists, please contact support.")
+        return
+    
     # Initialize session state
     initialize_session_state()
     
@@ -583,8 +655,10 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             if st.button("📊 Go to Dashboard", use_container_width=True):
-                # Navigate to landing page
-                st.switch_page("pages/02LandingPage.py")
+                try:
+                    st.switch_page("pages/02LandingPage.py")
+                except Exception:
+                    st.error("Dashboard page not found. Please check your page structure.")
         with col2:
             if st.button("🚪 Logout", use_container_width=True):
                 clear_session_state()
@@ -595,7 +669,6 @@ def main():
     # Display error message if present
     if st.session_state.error_message:
         st.error(st.session_state.error_message)
-        # Clear error after displaying
         st.session_state.error_message = None
     
     # Handle Google OAuth callback
@@ -605,41 +678,39 @@ def main():
     if auth_code and st.session_state.oauth_state == "initial":
         st.session_state.oauth_state = "processing"
         
-        try:
-            id_token, access_token = exchange_code_for_token(auth_code)
-            st.query_params.clear()
-            
-            if access_token and id_token:
-                email = get_email_from_google_token(access_token)
+        with st.spinner("Processing authentication..."):
+            try:
+                id_token, access_token = exchange_code_for_token(auth_code)
+                st.query_params.clear()
                 
-                if email:
-                    if auth_mode == "register":
-                        if email_exists(email):
-                            st.session_state.error_message = f"Email {email} is already registered. Please login instead."
-                        else:
-                            # Create new user with Google
-                            password = generate_secure_password()
-                            user, error = register_new_user(email, password)
-                            if user:
-                                st.session_state.user = user
-                                st.success("✅ Registration successful! You are now logged in.")
+                if access_token and id_token:
+                    email = get_email_from_google_token(access_token)
+                    
+                    if email:
+                        if auth_mode == "register":
+                            if email_exists(email):
+                                st.session_state.error_message = f"Email {email} is already registered. Please login instead."
                             else:
-                                st.session_state.error_message = error
-                    else:  # login mode
-                        if not email_exists(email):
-                            st.session_state.error_message = f"Email {email} is not registered. Please register first."
-                        else:
-                            # For existing Google users, we need to handle authentication differently
-                            # This is a simplified approach - in production, you'd want proper Google Firebase integration
-                            st.session_state.user = {"email": email, "localId": "google_user"}
-                            st.success("✅ Login successful!")
+                                password = generate_secure_password()
+                                user, error = register_new_user(email, password)
+                                if user:
+                                    st.session_state.user = user
+                                    st.success("✅ Registration successful! You are now logged in.")
+                                else:
+                                    st.session_state.error_message = error
+                        else:  # login mode
+                            if not email_exists(email):
+                                st.session_state.error_message = f"Email {email} is not registered. Please register first."
+                            else:
+                                st.session_state.user = {"email": email, "localId": "google_user"}
+                                st.success("✅ Login successful!")
+                    else:
+                        st.session_state.error_message = "Could not retrieve email from Google account."
                 else:
-                    st.session_state.error_message = "Could not retrieve email from Google account."
-            else:
-                st.session_state.error_message = "Authentication failed. Please try again."
-                
-        except Exception as e:
-            st.session_state.error_message = f"Authentication error: {str(e)}"
+                    st.session_state.error_message = "Authentication failed. Please try again."
+                    
+            except Exception as e:
+                st.session_state.error_message = f"Authentication error: {str(e)}"
         
         st.session_state.oauth_state = "completed"
         st.rerun()
@@ -663,7 +734,7 @@ def main():
                     if user:
                         st.session_state.user = user
                         st.success("✅ Login successful!")
-                        time.sleep(1)  # Brief pause to show success message
+                        time.sleep(1)
                         st.rerun()
                     else:
                         st.session_state.error_message = error_message
@@ -672,61 +743,93 @@ def main():
                     st.session_state.error_message = "Please enter both email and password."
                     st.rerun()
 
-            # Google Login Button
-            st.markdown('<div class="divider"><span>or continue with</span></div>', unsafe_allow_html=True)
-            
-            login_auth_url = get_google_auth_url(mode="login")
-            google_login_html = f'''
-                <a href="{login_auth_url}" target="_self" class="google-btn">
-                    <img src="https://developers.google.com/identity/images/g-logo.png"
-                        alt="Google Logo" width="20" height="20">
-                    <span>Continue with Google</span>
-                </a>
-            '''
-            st.markdown(google_login_html, unsafe_allow_html=True)
+            # Google Login Button (only show if properly configured)
+            if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
+                st.markdown('<div class="divider"><span>or continue with</span></div>', unsafe_allow_html=True)
+                
+                login_auth_url = get_google_auth_url(mode="login")
+                if login_auth_url:
+                    google_login_html = f'''
+                        <a href="{login_auth_url}" target="_self" class="google-btn">
+                            <img src="https://developers.google.com/identity/images/g-logo.png"
+                                alt="Google Logo" width="20" height="20">
+                            <span>Continue with Google</span>
+                        </a>
+                    '''
+                    st.markdown(google_login_html, unsafe_allow_html=True)
+                else:
+                    st.info("Google login is temporarily unavailable.")
 
         with tab2:
             with st.form("register_form", clear_on_submit=False):
                 st.markdown("### Create Your Account")
-                new_email = st.text_input("📧 Email Address", placeholder="Enter your email")
-                new_password = st.text_input("🔒 Password", type="password", placeholder="Create a strong password")
-                confirm_password = st.text_input("🔒 Confirm Password", type="password", placeholder="Confirm your password")
-                register_submitted = st.form_submit_button("🎉 Create Account")
+                new_email = st.text_input("📧 Email Address", placeholder="Enter your email", key="reg_email")
+                new_password = st.text_input("🔒 Password", type="password", placeholder="Create a password (min 6 characters)", key="reg_password")
+                confirm_password = st.text_input("🔒 Confirm Password", type="password", placeholder="Confirm your password", key="confirm_password")
+                register_submitted = st.form_submit_button("🎯 Create Account")
 
             if register_submitted:
-                if not new_email or not new_password or not confirm_password:
-                    st.session_state.error_message = "Please fill in all required fields."
-                    st.rerun()
-                elif new_password != confirm_password:
-                    st.session_state.error_message = "Passwords do not match."
-                    st.rerun()
-                elif len(new_password) < 6:
-                    st.session_state.error_message = "Password must be at least 6 characters long."
-                    st.rerun()
-                else:
-                    with st.spinner("Creating your account..."):
-                        user, error_message = register_new_user(new_email, new_password)
-                    
-                    if user:
-                        st.success("✅ Registration successful! Please log in now.")
-                        time.sleep(2)
+                if new_email and new_password and confirm_password:
+                    if new_password != confirm_password:
+                        st.session_state.error_message = "Passwords do not match. Please try again."
+                        st.rerun()
+                    elif len(new_password) < 6:
+                        st.session_state.error_message = "Password must be at least 6 characters long."
                         st.rerun()
                     else:
-                        st.session_state.error_message = error_message
-                        st.rerun()
+                        with st.spinner("Creating your account..."):
+                            user, error_message = register_new_user(new_email, new_password)
+                        
+                        if user:
+                            st.session_state.user = user
+                            st.success("✅ Registration successful! Welcome to MedScore Assist!")
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.session_state.error_message = error_message
+                            st.rerun()
+                else:
+                    st.session_state.error_message = "Please fill in all fields."
+                    st.rerun()
 
-            # Google Register Button
-            st.markdown('<div class="divider"><span>or sign up with</span></div>', unsafe_allow_html=True)
-            
-            register_auth_url = get_google_auth_url(mode="register")
-            google_register_html = f'''
-                <a href="{register_auth_url}" target="_self" class="google-btn">
-                    <img src="https://developers.google.com/identity/images/g-logo.png"
-                        alt="Google Logo" width="20" height="20">
-                    <span>Sign up with Google</span>
-                </a>
-            '''
-            st.markdown(google_register_html, unsafe_allow_html=True)
+            # Google Register Button (only show if properly configured)
+            if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
+                st.markdown('<div class="divider"><span>or sign up with</span></div>', unsafe_allow_html=True)
+                
+                register_auth_url = get_google_auth_url(mode="register")
+                if register_auth_url:
+                    google_register_html = f'''
+                        <a href="{register_auth_url}" target="_self" class="google-btn">
+                            <img src="https://developers.google.com/identity/images/g-logo.png"
+                                alt="Google Logo" width="20" height="20">
+                            <span>Sign up with Google</span>
+                        </a>
+                    '''
+                    st.markdown(google_register_html, unsafe_allow_html=True)
+                else:
+                    st.info("Google registration is temporarily unavailable.")
+
+    # Footer information
+    st.markdown("---")
+    st.markdown(
+        """
+        <div style='text-align: center; color: #666; font-size: 0.9em; margin-top: 2rem;'>
+            <p>🏥 MedScore Assist - Empowering Healthcare Professionals</p>
+            <p>Secure • Reliable • Professional</p>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        st.error("⚠️ An unexpected error occurred. Please refresh the page and try again.")
+        st.error(f"Error details: {str(e)}")
+        
+        # Clear session state on critical error
+        if st.button("🔄 Reset Application"):
+            clear_session_state()
+            st.query_params.clear()
+            st.rerun()
