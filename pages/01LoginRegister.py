@@ -401,8 +401,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Google OAuth Configuration
-GOOGLE_CLIENT_ID = "207857923434-3iaocbdg54hdfi7bqnrnjmi6rocjt8al.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_ID = "207857923434-42m4na50s1plg9905sqb14craq70koj9.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
 REDIRECT_URI = "http://localhost:8501/LoginRegister"
 FIREBASE_API_KEY = "AIzaSyD5l6ZiWTMDqoA7zqzSrqgQ_7uMCJAW9sM"
 
