@@ -37,12 +37,12 @@ st.markdown(
     unsafe_allow_html=True)
 
 # Reports folder path
-REPORTS_FOLDER = r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\reports"
+REPORTS_FOLDER = r"reports"
 os.makedirs(REPORTS_FOLDER, exist_ok=True)
 
 
 MEDSCORE_INFO = {
-    "logo": r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\mda.jpg",
+    "logo": r"mda.jpg",
     "email": "contact@medscore.com",
     "phone": "+91 8136092576",
     "address": "#45, Wellness Street, Bangalore-560045"
