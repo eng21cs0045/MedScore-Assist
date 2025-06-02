@@ -662,7 +662,7 @@ def main():
         st.success(f"✅ Welcome back, logged in as {user_email}!")
         
         time.sleep(3)
-        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+        st.switch_page("pages/02LandingPage.py")
 
     # Display error if present
     if "error_message" in st.session_state and st.session_state.error_message:
