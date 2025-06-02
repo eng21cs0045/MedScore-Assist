@@ -90,7 +90,7 @@ if st.session_state.heart_form_page == "non_tech":
     # Navigation Buttons
     col1, col2 = st.columns([0.8, 1.2])
     if col1.button("⬅️ Back to Home"):
-        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+        st.switch_page(r"pages/02LandingPage.py")
     if col2.button("Next ➡️"):
         st.session_state.heart_form_page = "tech"
         st.rerun()
@@ -131,7 +131,7 @@ elif st.session_state.heart_form_page == "tech":
         ]
 
         X_input = np.array(row).reshape(1, -1)
-        model = load_model(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\Models\heart_v2.pkl")
+        model = load_model(r"Models/heart_v2.pkl")
         scaler = load_scaler_heart()
         final_score = predict_score(model, scaler, X_input)
     
@@ -188,7 +188,7 @@ elif st.session_state.heart_form_page == "tech":
     
         generate_report(user_email, "Heart Model", params, final_score, concerning)
     if col3.button("View My Reports"):
-            st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\MyReports.py")
+            st.switch_page(r"pages/MyReports.py")
 
 # Prevent accidental reruns when not needed
 if __name__ == "__main__":
