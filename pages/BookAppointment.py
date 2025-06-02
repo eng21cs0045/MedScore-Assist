@@ -102,4 +102,4 @@ if st.button("Submit"):
 
 # Back button
 if st.button("⬅️ Back to Home"):
-    st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+    st.switch_page(r"pages/02LandingPage.py")
