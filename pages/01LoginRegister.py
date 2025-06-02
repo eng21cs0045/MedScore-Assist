@@ -6,7 +6,6 @@ import json
 import time
 import secrets
 import string
-import os
 
 # Page configuration with sidebar permanently hidden
 st.set_page_config(
@@ -35,22 +34,29 @@ st.markdown("""
         display: none !important;
     }
     
+    /* Adjust main content area */
+    .main .block-container, .st-emotion-cache-z5fcl4 {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        max-width: 100% !important;
+    }
+    
     /* Main container styling */
     .main {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
     }
     
-    /* Block container styling */
+    /* CRITICAL: Remove all default Streamlit spacing */
     .block-container {
         padding-top: 1rem !important;
         padding-bottom: 0.5rem !important;
-        max-width: 500px !important;
+        max-width: 500px !important;  /* REDUCED FROM 1200px */
         margin: 0 auto !important;
         width: 100% !important;
     }
     
-    /* Remove default Streamlit spacing */
+    /* AGGRESSIVE spacing removal - target all possible Streamlit containers */
     .element-container {
         margin: 0 !important;
         padding: 0 !important;
@@ -61,7 +67,57 @@ st.markdown("""
         padding: 0 !important;
     }
     
-    /* Header styling */
+    /* Target ALL Streamlit spacing classes - ENHANCED */
+    .css-1y4p8pa, .st-emotion-cache-1y4p8pa,
+    .css-ocqkz7, .st-emotion-cache-ocqkz7,
+    .css-16idsys, .st-emotion-cache-16idsys,
+    .css-1wbqy5l, .st-emotion-cache-1wbqy5l,
+    .css-1d391kg, .st-emotion-cache-1d391kg,
+    .css-12oz5g7, .st-emotion-cache-12oz5g7,
+    .css-1y0tads, .st-emotion-cache-1y0tads,
+    .css-k1vhr4, .st-emotion-cache-k1vhr4,
+    .css-1629p8f, .st-emotion-cache-1629p8f,
+    .css-10trblm, .st-emotion-cache-10trblm,
+    .css-16huue1, .st-emotion-cache-16huue1 {
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+    
+    /* Force tight spacing on containers */
+    .stContainer, .stContainer > div {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Remove gaps between consecutive elements - ENHANCED */
+    .stMarkdown + .stTabs,
+    .stMarkdown + .stContainer,
+    .stContainer + .stTabs,
+    .stMarkdown + .stMarkdown,
+    div[data-testid="element-container"] + div[data-testid="element-container"] {
+        margin-top: 0 !important;
+    }
+    
+    /* SPECIFIC FIX: Target the exact spacing issue between header and tabs */
+    .stTabs {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    
+    /* Target any empty div containers that might be causing spacing */
+    div:empty,
+    .stMarkdown:empty,
+    .element-container:empty {
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Header styling with tight spacing */
     .main-header {
         text-align: center;
         color: white;
@@ -73,41 +129,41 @@ st.markdown("""
     
     .sub-header {
         text-align: center;
-        color: #00008B !important;
+        color: #00008B !important;  /* Teal */
         font-size: 1.5rem;
         margin: 0 0 0.5rem 0 !important;
         font-weight: 400;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);  /* Added text shadow for better readability */
     }
     
-    /* Tab container styling */
+    /* SMALLER WHITE CONTAINER: Reduced tab styling */
     .stTabs {
         background: rgba(255, 255, 255, 0.95);
-        padding: 2rem !important;
-        border-radius: 15px;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        padding: 2rem !important;  /* REDUCED FROM 3rem */
+        border-radius: 15px;  /* REDUCED FROM 20px */
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);  /* REDUCED shadow */
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255,255,255,0.2);
-        max-width: 400px !important;
-        width: 400px !important;
-        margin: 0 auto !important;
+        max-width: 400px !important;  /* REDUCED FROM 100% */
+        width: 400px !important;  /* FIXED WIDTH - SMALLER */
+        margin: 0 auto !important;  /* CENTER THE SMALLER BOX */
         box-sizing: border-box !important;
     }
     
-    /* Tab list styling */
+    /* FIXED: Tab list styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 6px;
+        gap: 6px;  /* REDUCED FROM 8px */
         background-color: #f8f9fa;
-        padding: 6px;
-        border-radius: 10px;
-        margin: 0 0 1.5rem 0 !important;
+        padding: 6px;  /* REDUCED FROM 8px */
+        border-radius: 10px;  /* REDUCED FROM 12px */
+        margin: 0 0 1.5rem 0 !important;  /* REDUCED FROM 2rem */
         width: 100% !important;
         box-sizing: border-box !important;
     }
     
     .stTabs [data-baseweb="tab"] {
-        height: 45px;
-        padding: 0px 20px;
+        height: 45px;  /* REDUCED FROM 50px */
+        padding: 0px 20px;  /* REDUCED FROM 24px */
         background-color: transparent;
         border-radius: 8px;
         color: #6c757d;
@@ -124,25 +180,25 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
-    /* Tab panel content styling */
+    /* FIXED: Tab panel content styling */
     .stTabs [data-baseweb="tab-panel"] {
         padding: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
     
-    /* Form styling */
+    /* SMALLER FORM: Form container within tabs */
     .stTabs .stForm {
         width: 100% !important;
         box-sizing: border-box !important;
-        max-width: 100% !important;
+        max-width: 100% !important;  /* FILL THE SMALLER CONTAINER */
         margin: 0 auto !important;
     }
     
-    /* Input field styling */
+    /* FIXED: Input field styling with proper containment */
     .stTabs .stTextInput {
         width: 100% !important;
-        margin-bottom: 1.2rem !important;
+        margin-bottom: 1.2rem !important;  /* REDUCED FROM 1.5rem */
         box-sizing: border-box !important;
     }
     
@@ -159,9 +215,9 @@ st.markdown("""
     .stTabs .stTextInput > div > div > input {
         background-color: #f8f9fa;
         border: 2px solid #e9ecef;
-        border-radius: 10px;
-        padding: 14px 18px;
-        font-size: 15px;
+        border-radius: 10px;  /* REDUCED FROM 12px */
+        padding: 14px 18px;  /* REDUCED FROM 16px 20px */
+        font-size: 15px;  /* REDUCED FROM 16px */
         transition: all 0.3s ease;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -174,19 +230,19 @@ st.markdown("""
         outline: none;
     }
     
-    /* Input labels */
+    /* FIXED: Input labels */
     .stTabs .stTextInput label {
         color: #495057 !important;
         font-weight: 600 !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 6px !important;  /* REDUCED FROM 8px */
         display: block !important;
-        font-size: 15px !important;
+        font-size: 15px !important;  /* REDUCED FROM 16px */
     }
     
-    /* Button styling */
+    /* SMALLER BUTTON: Button styling with proper containment */
     .stTabs .stButton {
         width: 100% !important;
-        margin-top: 1.2rem !important;
+        margin-top: 1.2rem !important;  /* REDUCED FROM 1.5rem */
         box-sizing: border-box !important;
     }
     
@@ -194,9 +250,9 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 10px;
-        padding: 14px 28px;
-        font-size: 15px;
+        border-radius: 10px;  /* REDUCED FROM 12px */
+        padding: 14px 28px;  /* REDUCED FROM 16px 32px */
+        font-size: 15px;  /* REDUCED FROM 16px */
         font-weight: 600;
         width: 100% !important;
         transition: all 0.3s ease;
@@ -209,29 +265,29 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
     }
     
-    /* Section headers */
+    /* SMALLER HEADERS: Section headers within tabs */
     .stTabs h3 {
         color: #333 !important;
-        font-size: 1.6rem !important;
+        font-size: 1.6rem !important;  /* REDUCED FROM 1.8rem */
         font-weight: 600 !important;
-        margin: 0 0 1.5rem 0 !important;
+        margin: 0 0 1.5rem 0 !important;  /* REDUCED FROM 2rem */
         text-align: center !important;
     }
     
-    /* Google button styling */
+    /* SMALLER Google button styling */
     .google-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 14px 20px;
+        padding: 14px 20px;  /* REDUCED FROM 16px 24px */
         border: 2px solid #e9ecef;
-        border-radius: 10px;
+        border-radius: 10px;  /* REDUCED FROM 12px */
         background-color: white;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none !important;
         width: 100%;
-        margin-top: 1.2rem;
+        margin-top: 1.2rem;  /* REDUCED FROM 1.5rem */
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         box-sizing: border-box;
     }
@@ -243,23 +299,23 @@ st.markdown("""
     }
     
     .google-btn img {
-        margin-right: 10px;
+        margin-right: 10px;  /* REDUCED FROM 12px */
     }
     
     .google-btn span {
         color: #5f6368;
         font-family: 'Roboto', Arial, sans-serif;
-        font-size: 15px;
+        font-size: 15px;  /* REDUCED FROM 16px */
         font-weight: 500;
     }
     
     /* Divider styling */
     .divider {
         text-align: center;
-        margin: 1.5rem 0;
+        margin: 1.5rem 0;  /* REDUCED FROM 2rem */
         position: relative;
         color: #6c757d;
-        font-size: 13px;
+        font-size: 13px;  /* REDUCED FROM 14px */
         font-weight: 500;
     }
     
@@ -280,22 +336,30 @@ st.markdown("""
     
     /* Success/Error message styling */
     .stSuccess, .stError {
-        border-radius: 10px;
+        border-radius: 10px;  /* REDUCED FROM 12px */
         border: none;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         margin: 1rem 0;
     }
     
-    /* Debug info styling - HIDDEN IN PRODUCTION */
-    .debug-info {
-        display: none !important; /* Change to 'block' for debugging */
-        background: rgba(255,255,255,0.9);
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-        font-family: monospace;
-        font-size: 12px;
-        border-left: 4px solid #007bff;
+    /* NUCLEAR OPTION: Remove all possible margins and paddings from Streamlit */
+    [data-testid="element-container"],
+    [data-testid="block-container"],
+    .element-container,
+    .block-container {
+        max-width: 500px !important;  /* REDUCED FROM 1200px */
+        margin: 0 auto !important;
+        width: 100% !important;
+    }
+    
+    /* Specific targeting for the problematic white space */
+    .main > div:first-child {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+        max-width: 500px !important;  /* REDUCED FROM 1200px */
+        margin-left: auto !important;
+        margin-right: auto !important;
+        width: 100% !important;
     }
     
     /* Responsive design */
@@ -309,14 +373,18 @@ st.markdown("""
         
         .stTabs {
             margin: 0 !important;
-            padding: 1.5rem !important;
+            padding: 1.5rem !important;  /* REDUCED FROM 2rem */
             max-width: calc(100vw - 2rem) !important;
             width: calc(100vw - 2rem) !important;
             border-radius: 12px;
         }
         
+        .stTabs .stForm {
+            max-width: 100% !important;
+        }
+        
         .main-header {
-            font-size: 2.2rem;
+            font-size: 2.2rem;  /* REDUCED FROM 2.5rem */
             margin: 0.3rem 0 0.2rem 0 !important;
         }
         
@@ -332,40 +400,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# FIXED: Configuration using Streamlit secrets and environment detection
-def get_config():
-    """Get configuration based on environment"""
-    try:
-        # Try to get from Streamlit secrets first (for Streamlit Cloud)
-        if hasattr(st, 'secrets'):
-            return {
-                "GOOGLE_CLIENT_ID": st.secrets.get("GOOGLE_CLIENT_ID", ""),
-                "GOOGLE_CLIENT_SECRET": st.secrets.get("GOOGLE_CLIENT_SECRET", ""),
-                "FIREBASE_API_KEY": st.secrets.get("FIREBASE_API_KEY", ""),
-                "REDIRECT_URI": st.secrets.get("REDIRECT_URI", "")
-            }
-    except:
-        pass
-    
-    # Fallback to environment variables
-    return {
-        "GOOGLE_CLIENT_ID": os.getenv("GOOGLE_CLIENT_ID", "207857923434-3iaocbdg54hdfi7bqnrnjmi6rocjt8al.apps.googleusercontent.com"),
-        "GOOGLE_CLIENT_SECRET": os.getenv("GOOGLE_CLIENT_SECRET", "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"),
-        "FIREBASE_API_KEY": os.getenv("FIREBASE_API_KEY", "AIzaSyD5l6ZiWTMDqoA7zqzSrqgQ_7uMCJAW9sM"),
-        "REDIRECT_URI": os.getenv("REDIRECT_URI", "http://localhost:8501")
-    }
-
-# Get configuration
-config = get_config()
-GOOGLE_CLIENT_ID = config["GOOGLE_CLIENT_ID"]
-GOOGLE_CLIENT_SECRET = config["GOOGLE_CLIENT_SECRET"]
-FIREBASE_API_KEY = config["FIREBASE_API_KEY"]
-REDIRECT_URI = config["REDIRECT_URI"]
-
-# FIXED: Auto-detect redirect URI if not set properly
-if REDIRECT_URI == "http://localhost:8501" and "streamlit.app" in st.query_params.get("host", ""):
-    # Auto-detect Streamlit Cloud URL
-    REDIRECT_URI = f"https://{st.query_params.get('host', '')}"
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID = "207857923434-3iaocbdg54hdfi7bqnrnjmi6rocjt8al.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
+REDIRECT_URI = "http://localhost:8501/LoginRegister"
+FIREBASE_API_KEY = "AIzaSyD5l6ZiWTMDqoA7zqzSrqgQ_7uMCJAW9sM"
 
 # Initialize Firebase with Pyrebase
 firebaseConfig = {
@@ -378,46 +417,27 @@ firebaseConfig = {
     "appId": "1:207857923434:web:a89b72e7ce45e36f9d2113"
 }
 
-# Initialize Firebase with error handling
-try:
-    firebase = pyrebase.initialize_app(firebaseConfig)
-    auth = firebase.auth()
-    db = firebase.database()
-    firebase_initialized = True
-except Exception as e:
-    st.error(f"Firebase initialization failed: {str(e)}")
-    firebase_initialized = False
-    auth = None
-    db = None
+# Initialize Firebase
+firebase = pyrebase.initialize_app(firebaseConfig)
+auth = firebase.auth()
+db = firebase.database()
 
 # Function to generate a secure random password
 def generate_secure_password(length=12):
     alphabet = string.ascii_letters + string.digits + "!@#$%^&*()_-+=<>?"
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-# FIXED: Dynamic redirect URI for Google OAuth
+# Function to generate Google OAuth URL
 def get_google_auth_url(mode="login"):
-    if not GOOGLE_CLIENT_ID:
-        return None
-        
-    # Try to auto-detect the current URL
-    current_url = REDIRECT_URI
-    try:
-        # Get the current page URL from browser
-        if hasattr(st, 'query_params') and st.query_params:
-            # This is a simplified approach - in production you might need more sophisticated URL detection
-            pass
-    except:
-        pass
-    
-    scope = "openid email profile"
+    scope = "openid email profile https://www.googleapis.com/auth/userinfo.email"
     params = {
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": current_url,
+        "redirect_uri": REDIRECT_URI,
         "response_type": "code",
         "scope": scope,
         "access_type": "offline",
         "prompt": "consent",
+        "include_granted_scopes": "true",
         "state": mode
     }
     encoded_params = urlencode(params, quote_via=quote_plus)
@@ -425,7 +445,7 @@ def get_google_auth_url(mode="login"):
 
 # Function to exchange authorization code for tokens
 def exchange_code_for_token(code):
-    if not code or not GOOGLE_CLIENT_SECRET:
+    if not code:
         return None, None
     
     token_url = "https://oauth2.googleapis.com/token"
@@ -439,15 +459,18 @@ def exchange_code_for_token(code):
     }
     
     try:
-        response = requests.post(token_url, data=payload, timeout=10)
+        response = requests.post(token_url, data=payload)
         
         if response.status_code != 200:
             return None, None
             
         token_data = response.json()
+        
+        if "refresh_token" in token_data:
+            st.session_state["refresh_token"] = token_data["refresh_token"]
+            
         return token_data.get("id_token"), token_data.get("access_token")
     except Exception as e:
-        st.error(f"Token exchange failed: {str(e)}")
         return None, None
 
 # Function to get email from Google access token
@@ -459,264 +482,267 @@ def get_email_from_google_token(access_token):
         user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
         headers = {"Authorization": f"Bearer {access_token}"}
         
-        response = requests.get(user_info_url, headers=headers, timeout=10)
+        response = requests.get(user_info_url, headers=headers)
         
         if response.status_code != 200:
             return None
             
         user_info = response.json()
         return user_info.get("email")
-    except Exception:
+    except Exception as e:
         return None
 
-# FIXED: More robust email existence check
+# Improved function to reliably check if email exists in Firebase
 def email_exists(email):
-    """Check if email exists in Firebase Auth"""
-    if not email or not firebase_initialized:
+    if not email:
         return False
-    
+        
     try:
-        # Use Firebase Auth REST API to check if email exists
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key={FIREBASE_API_KEY}"
         payload = {
             "identifier": email,
             "continueUri": REDIRECT_URI
         }
         
-        response = requests.post(url, json=payload, timeout=10)
+        response = requests.post(url, json=payload)
         
         if response.status_code == 200:
             data = response.json()
-            return data.get('registered', False)
-        else:
-            return email_exists_fallback(email)
-            
-    except Exception as e:
-        print(f"Error checking email existence: {e}")
-        return email_exists_fallback(email)
-
-def email_exists_fallback(email):
-    """Fallback method to check email existence"""
-    if not firebase_initialized:
-        return False
+            return data.get("registered", False)
+    except Exception:
+        pass
         
     try:
-        # Try to sign in with a dummy password
-        auth.sign_in_with_email_and_password(email, "dummy_password_that_wont_work_123456")
+        auth.sign_in_with_email_and_password(email, "ThisIsADeliberatelyWrongPassword123!@#")
         return True
     except Exception as e:
-        error_message = str(e).upper()
-        if any(phrase in error_message for phrase in ["INVALID_PASSWORD", "WRONG_PASSWORD"]):
+        error_message = str(e)
+        if "INVALID_PASSWORD" in error_message:
             return True
-        elif any(phrase in error_message for phrase in ["EMAIL_NOT_FOUND", "USER_NOT_FOUND"]):
+        elif "EMAIL_NOT_FOUND" in error_message or "INVALID_LOGIN_CREDENTIALS" in error_message:
             return False
-        elif "INVALID_LOGIN_CREDENTIALS" in error_message:
-            return True  # Conservative approach
-        else:
-            return False
+        
+    return False
 
-# FIXED: Improved login function with better error handling and timeout
+# Function to check if user is registered with email/password
+def is_email_password_user(email):
+    try:
+        user_data_ref = db.child("users").child(email.replace('.', ','))
+        user_data = user_data_ref.get().val()
+        return user_data and 'has_password' in user_data and user_data['has_password']
+    except Exception:
+        return False
+
+# Function to link Google sign-in with email/password
+def link_google_with_email_password(email, user_id):
+    try:
+        password = generate_secure_password()
+        
+        sanitized_email = email.replace('.', ',')
+        user_data = {
+            'email': email,
+            'has_password': True,
+            'password': password,
+            'user_id': user_id
+        }
+        
+        db.child("users").child(sanitized_email).set(user_data)
+        
+        return password
+    except Exception as e:
+        st.error(f"Error linking account: {str(e)}")
+        return None
+
+# Function to sign in with Firebase using Google ID token
+def firebase_sign_in_with_google(id_token, email, mode="login"):
+    if not id_token or not email:
+        return None
+
+    try:
+        firebase_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key={FIREBASE_API_KEY}"
+        payload = {
+            "postBody": f"id_token={id_token}&providerId=google.com",
+            "requestUri": REDIRECT_URI,
+            "returnIdpCredential": True,
+            "returnSecureToken": True
+        }
+        
+        response = requests.post(firebase_url, json=payload)
+        response_json = response.json()
+        
+        if response.status_code != 200:
+            return None
+            
+        if "email" not in response_json:
+            return None
+            
+        is_new_user = response_json.get("isNewUser", False)
+        
+        if mode == "register" and not is_new_user:
+            return {"error": "already_registered", "email": email}
+            
+        if mode == "login" and is_new_user:
+            return {"error": "not_registered", "email": email}
+        
+        if mode == "register" and is_new_user:
+            user_id = response_json.get("localId")
+            password = link_google_with_email_password(email, user_id)
+            if password:
+                response_json["generated_password"] = password
+            
+        return response_json
+    except Exception as e:
+        return None
+
+# Function to attempt direct login with email and password
 def attempt_direct_login(email, password):
-    """Attempt to login with email and password"""
     if not email or not password:
         return None, "Please enter both email and password."
     
-    if not firebase_initialized:
-        return None, "Authentication service is not available. Please try again later."
-    
     try:
+        sanitized_email = email.replace('.', ',')
+        user_data = db.child("users").child(sanitized_email).get().val()
+        
+        if user_data and user_data.get('has_password', False):
+            if user_data.get('password') == password:
+                user = auth.sign_in_with_email_and_password(email, password)
+                return user, None
+            else:
+                return None, "Invalid password. Please try again."
+        
         user = auth.sign_in_with_email_and_password(email, password)
         return user, None
     except Exception as e:
-        error_message = str(e).upper()
-        
-        if any(phrase in error_message for phrase in ["INVALID_PASSWORD", "WRONG_PASSWORD"]):
+        error_message = str(e)
+        if "INVALID_PASSWORD" in error_message:
             return None, "Invalid password. Please try again."
-        elif any(phrase in error_message for phrase in ["EMAIL_NOT_FOUND", "USER_NOT_FOUND"]):
-            return None, "Email is not registered. Please register first."
-        elif "INVALID_LOGIN_CREDENTIALS" in error_message:
-            return None, "Invalid email or password. Please check your credentials."
-        elif "TOO_MANY_ATTEMPTS_TRY_LATER" in error_message:
-            return None, "Too many failed attempts. Please try again later."
-        elif "USER_DISABLED" in error_message:
-            return None, "This account has been disabled. Please contact support."
-        elif "NETWORK" in error_message or "TIMEOUT" in error_message:
-            return None, "Network error. Please check your connection and try again."
-        else:
-            print(f"Login error: {error_message}")
-            return None, "Login failed. Please try again."
-
-# FIXED: Improved registration function
-def register_new_user(email, password):
-    if not email or not password:
-        return None, "Please provide both email and password."
-    
-    if not firebase_initialized:
-        return None, "Registration service is not available. Please try again later."
-    
-    try:
-        # Check if email already exists first
-        if email_exists(email):
-            return None, "Email already registered. Please login instead."
-        
-        user = auth.create_user_with_email_and_password(email, password)
-        
-        # Store additional user data
-        try:
+        elif "INVALID_LOGIN_CREDENTIALS" in error_message or "EMAIL_NOT_FOUND" in error_message:
             sanitized_email = email.replace('.', ',')
-            user_data = {
-                'email': email,
-                'has_password': True,
-                'user_id': user['localId'],
-                'created_at': time.time()
-            }
-            db.child("users").child(sanitized_email).set(user_data)
-        except Exception as db_error:
-            # User created but database write failed - still return success
-            print(f"Database write error: {db_error}")
-        
-        return user, None
-    except Exception as e:
-        error_message = str(e).upper()
-        if "EMAIL_EXISTS" in error_message:
-            return None, "Email already registered. Please login instead."
-        elif "WEAK_PASSWORD" in error_message:
-            return None, "Password is too weak. Please use at least 6 characters."
-        elif "INVALID_EMAIL" in error_message:
-            return None, "Invalid email format. Please enter a valid email."
-        elif "NETWORK" in error_message or "TIMEOUT" in error_message:
-            return None, "Network error. Please check your connection and try again."
+            user_data = db.child("users").child(sanitized_email).get().val()
+            
+            if user_data:
+                return None, "This account was registered with Google. Please use 'Login with Google' button."
+            else:
+                return None, "Email is not registered. Please register first."
         else:
-            print(f"Registration error: {error_message}")
-            return None, "Registration failed. Please try again."
+            return None, f"Login failed: {error_message}"
 
-# Function to clear session state
-def clear_session_state():
-    """Clear all session state except essential keys"""
-    keys_to_keep = ['oauth_state']
+# Function to log out the user
+def handle_logout():
+    keys_to_keep = []
+    
     for key in list(st.session_state.keys()):
         if key not in keys_to_keep:
             del st.session_state[key]
-
-# Function to initialize session state
-def initialize_session_state():
-    """Initialize session state with default values"""
-    if "oauth_state" not in st.session_state:
-        st.session_state.oauth_state = "initial"
-    if "user" not in st.session_state:
-        st.session_state.user = None
-    if "error_message" not in st.session_state:
-        st.session_state.error_message = None
-
-# FIXED: Enhanced debug info with environment detection
-def display_debug_info():
-    """Display debug information for development"""
-    debug_info = {
-        "environment": "Streamlit Cloud" if "streamlit.app" in REDIRECT_URI else "Local",
-        "firebase_initialized": firebase_initialized,
-        "oauth_state": st.session_state.get("oauth_state", "None"),
-        "user_logged_in": st.session_state.get("user") is not None,
-        "error_message": st.session_state.get("error_message", "None"),
-        "redirect_uri": REDIRECT_URI,
-        "has_google_config": bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET),
-        "query_params": dict(st.query_params)
-    }
     
-    st.markdown(f"""
-    <div class="debug-info">
-        <strong>Debug Info:</strong><br>
-        {json.dumps(debug_info, indent=2)}
-    </div>
-    """, unsafe_allow_html=True)
+    st.query_params.clear()
+    st.rerun()
 
-# FIXED: Enhanced main function with better error handling
+# Main Function
 def main():
-    # Check if Firebase is initialized
-    if not firebase_initialized:
-        st.error("⚠️ Authentication service is currently unavailable. Please try again later.")
-        st.info("If this problem persists, please contact support.")
-        return
-    
-    # Initialize session state
-    initialize_session_state()
-    
-    # Header
+    # Header with tight spacing
     st.markdown('<h1 class="main-header">MEDSCORE ASSIST</h1>', unsafe_allow_html=True)
     st.markdown('<p class="sub-header">Your Medical Assessment Companion</p>', unsafe_allow_html=True)
     
-    # Display debug info (hidden by CSS in production)
-    display_debug_info()
-    
-    # Check if user is already logged in
-    if st.session_state.user is not None:
-        user_email = st.session_state.user.get('email', 'Unknown')
-        st.success(f"✅ Welcome back, {user_email}!")
+    # Initialize session state
+    if "oauth_state" not in st.session_state:
+        st.session_state.oauth_state = "initial"
         
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("📊 Go to Dashboard", use_container_width=True):
-                try:
-                    st.switch_page("pages/02LandingPage.py")
-                except Exception:
-                    st.error("Dashboard page not found. Please check your page structure.")
-        with col2:
-            if st.button("🚪 Logout", use_container_width=True):
-                clear_session_state()
-                st.query_params.clear()
-                st.rerun()
-        return
-    
-    # Display error message if present
-    if st.session_state.error_message:
-        st.error(st.session_state.error_message)
+    if "current_tab" not in st.session_state:
+        st.session_state.current_tab = "login"
+        
+    if "error_message" not in st.session_state:
         st.session_state.error_message = None
-    
-    # Handle Google OAuth callback
-    auth_code = st.query_params.get("code", "")
+
+    # User is already logged in - redirect to Landing Page
+    if "user" in st.session_state and not isinstance(st.session_state["user"], dict) or \
+    "user" in st.session_state and isinstance(st.session_state["user"], dict) and "error" not in st.session_state["user"]:
+        
+        user_email = st.session_state['user'].get('email', '')
+        st.success(f"✅ Welcome back, logged in as {user_email}!")
+        
+        time.sleep(3)
+        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+
+    # Display error if present
+    if "error_message" in st.session_state and st.session_state.error_message:
+        error_placeholder = st.empty()
+        error_placeholder.error(st.session_state.error_message)
+        time.sleep(3)
+        error_placeholder.empty()
+        st.session_state.error_message = None
+        st.rerun()
+
+    # Get state (mode) and code from query parameters
+    has_auth_code = "code" in st.query_params
+    auth_code = st.query_params.get("code", "") if has_auth_code else ""
     auth_mode = st.query_params.get("state", "login")
     
-    if auth_code and st.session_state.oauth_state == "initial":
+    # Process Google OAuth callback only once
+    if has_auth_code and st.session_state.oauth_state == "initial":
         st.session_state.oauth_state = "processing"
         
-        with st.spinner("Processing authentication..."):
-            try:
-                id_token, access_token = exchange_code_for_token(auth_code)
-                st.query_params.clear()
+        try:
+            id_token, access_token = exchange_code_for_token(auth_code)
+            
+            st.query_params.clear()
+            
+            if access_token and id_token:
+                email = get_email_from_google_token(access_token)
                 
-                if access_token and id_token:
-                    email = get_email_from_google_token(access_token)
-                    
-                    if email:
-                        if auth_mode == "register":
-                            if email_exists(email):
-                                st.session_state.error_message = f"Email {email} is already registered. Please login instead."
+                if email:
+                    firebase_user = firebase_sign_in_with_google(id_token, email, auth_mode)
+                    if firebase_user:
+                        if "error" in firebase_user:
+                            if firebase_user["error"] == "already_registered":
+                                st.session_state.error_message = f"Email {firebase_user['email']} is already registered. Please login instead."
+                                st.session_state.current_tab = "login"
+                            elif firebase_user["error"] == "not_registered":
+                                st.session_state.error_message = f"Email {firebase_user['email']} is not registered. Please register first."
+                                st.session_state.current_tab = "register"
+                            st.session_state.oauth_state = "failed"
+                            st.rerun()
+                        else:
+                            st.session_state["user"] = firebase_user
+                            
+                            if "generated_password" in firebase_user:
+                                st.session_state["generated_password"] = firebase_user["generated_password"]
+                            
+                            st.session_state.oauth_state = "completed"
+                            
+                            if auth_mode == "register":
+                                st.success("✅ Registration successful! Please log in now.")
+                                st.session_state.current_tab = "login"
                             else:
-                                password = generate_secure_password()
-                                user, error = register_new_user(email, password)
-                                if user:
-                                    st.session_state.user = user
-                                    st.success("✅ Registration successful! You are now logged in.")
-                                else:
-                                    st.session_state.error_message = error
-                        else:  # login mode
-                            if not email_exists(email):
-                                st.session_state.error_message = f"Email {email} is not registered. Please register first."
-                            else:
-                                st.session_state.user = {"email": email, "localId": "google_user"}
                                 st.success("✅ Login successful!")
+                                st.rerun()
                     else:
-                        st.session_state.error_message = "Could not retrieve email from Google account."
+                        st.session_state.error_message = "Firebase authentication failed. Please try again."
+                        st.session_state.oauth_state = "failed"
                 else:
-                    st.session_state.error_message = "Authentication failed. Please try again."
-                    
-            except Exception as e:
-                st.session_state.error_message = f"Authentication error: {str(e)}"
-        
-        st.session_state.oauth_state = "completed"
-        st.rerun()
+                    st.session_state.error_message = "Could not retrieve email from Google account."
+                    st.session_state.oauth_state = "failed"
+            else:
+                st.session_state.error_message = "Could not obtain tokens from Google."
+                st.session_state.oauth_state = "failed"
+            
+        except Exception as e:
+            st.session_state.error_message = f"Authentication error: {str(e)}"
+            st.session_state.oauth_state = "failed"
     
-    # Main login/register interface
-    if st.session_state.oauth_state in ["initial", "completed"]:
+    # Reset state if authentication failed
+    if st.session_state.oauth_state == "failed":
+        if st.button("🔄 Try Again"):
+            st.session_state.oauth_state = "initial"
+            st.query_params.clear()
+            st.session_state.error_message = None
+            st.rerun()
+
+    # Main form container
+    if st.session_state.oauth_state == "initial":
+        st.markdown('<div class="form-container">', unsafe_allow_html=True)
+        
+        # Use tabs for switching between login and register
         tab1, tab2 = st.tabs(["🔑 Login", "📝 Register"])
         
         with tab1:
@@ -726,110 +752,89 @@ def main():
                 password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
                 login_submitted = st.form_submit_button("🚀 Log In")
 
-            if login_submitted:
-                if email and password:
-                    with st.spinner("Logging you in..."):
-                        user, error_message = attempt_direct_login(email, password)
-                    
-                    if user:
-                        st.session_state.user = user
-                        st.success("✅ Login successful!")
-                        time.sleep(1)
-                        st.rerun()
-                    else:
-                        st.session_state.error_message = error_message
-                        st.rerun()
-                else:
-                    st.session_state.error_message = "Please enter both email and password."
+            if login_submitted and email and password:
+                user, error_message = attempt_direct_login(email, password)
+                
+                if user:
+                    st.session_state["user"] = user
+                    st.success("✅ Login successful!")
+                    time.sleep(1)
+                    st.rerun()
+                elif error_message:
+                    st.session_state.error_message = error_message
                     st.rerun()
 
-            # Google Login Button (only show if properly configured)
-            if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
-                st.markdown('<div class="divider"><span>or continue with</span></div>', unsafe_allow_html=True)
-                
-                login_auth_url = get_google_auth_url(mode="login")
-                if login_auth_url:
-                    google_login_html = f'''
-                        <a href="{login_auth_url}" target="_self" class="google-btn">
-                            <img src="https://developers.google.com/identity/images/g-logo.png"
-                                alt="Google Logo" width="20" height="20">
-                            <span>Continue with Google</span>
-                        </a>
-                    '''
-                    st.markdown(google_login_html, unsafe_allow_html=True)
-                else:
-                    st.info("Google login is temporarily unavailable.")
+            # Google Login Button
+            st.markdown('<div class="divider"><span>or continue with</span></div>', unsafe_allow_html=True)
+            
+            login_auth_url = get_google_auth_url(mode="login")
+            google_login_html = f'''
+                <a href="{login_auth_url}" target="_self" class="google-btn">
+                    <img src="https://developers.google.com/identity/images/g-logo.png"
+                        alt="Google Logo" width="20" height="20">
+                    <span>Continue with Google</span>
+                </a>
+            '''
+            st.markdown(google_login_html, unsafe_allow_html=True)
 
         with tab2:
             with st.form("register_form", clear_on_submit=False):
                 st.markdown("### Create Your Account")
-                new_email = st.text_input("📧 Email Address", placeholder="Enter your email", key="reg_email")
-                new_password = st.text_input("🔒 Password", type="password", placeholder="Create a password (min 6 characters)", key="reg_password")
-                confirm_password = st.text_input("🔒 Confirm Password", type="password", placeholder="Confirm your password", key="confirm_password")
-                register_submitted = st.form_submit_button("🎯 Create Account")
+                new_email = st.text_input("📧 Email Address", placeholder="Enter your email")
+                new_password = st.text_input("🔒 Password", type="password", placeholder="Create a strong password")
+                confirm_password = st.text_input("🔒 Confirm Password", type="password", placeholder="Confirm your password")
+                register_submitted = st.form_submit_button("🎉 Create Account")
 
             if register_submitted:
-                if new_email and new_password and confirm_password:
-                    if new_password != confirm_password:
-                        st.session_state.error_message = "Passwords do not match. Please try again."
-                        st.rerun()
-                    elif len(new_password) < 6:
-                        st.session_state.error_message = "Password must be at least 6 characters long."
-                        st.rerun()
-                    else:
-                        with st.spinner("Creating your account..."):
-                            user, error_message = register_new_user(new_email, new_password)
-                        
-                        if user:
-                            st.session_state.user = user
-                            st.success("✅ Registration successful! Welcome to MedScore Assist!")
-                            time.sleep(1)
+                if not new_email or not new_password:
+                    st.session_state.error_message = "Please fill in all required fields."
+                    st.rerun()
+                elif new_password != confirm_password:
+                    st.session_state.error_message = "Passwords do not match."
+                    st.rerun()
+                else:
+                    try:
+                        if email_exists(new_email):
+                            st.session_state.error_message = "Email already registered. Please login instead."
                             st.rerun()
                         else:
-                            st.session_state.error_message = error_message
+                            user = auth.create_user_with_email_and_password(new_email, new_password)
+                            
+                            sanitized_email = new_email.replace('.', ',')
+                            user_data = {
+                                'email': new_email,
+                                'has_password': True,
+                                'password': new_password,
+                                'user_id': user['localId']
+                            }
+                            db.child("users").child(sanitized_email).set(user_data)
+                            
+                            st.success("✅ Registration successful! Please log in now.")
+                            st.session_state.current_tab = "login"
+                            time.sleep(2)
                             st.rerun()
-                else:
-                    st.session_state.error_message = "Please fill in all fields."
-                    st.rerun()
+                    except Exception as e:
+                        error_message = str(e)
+                        if "EMAIL_EXISTS" in error_message:
+                            st.session_state.error_message = "Email already registered. Please login instead."
+                        else:
+                            st.session_state.error_message = f"Registration failed: {error_message}"
+                        st.rerun()
 
-            # Google Register Button (only show if properly configured)
-            if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
-                st.markdown('<div class="divider"><span>or sign up with</span></div>', unsafe_allow_html=True)
-                
-                register_auth_url = get_google_auth_url(mode="register")
-                if register_auth_url:
-                    google_register_html = f'''
-                        <a href="{register_auth_url}" target="_self" class="google-btn">
-                            <img src="https://developers.google.com/identity/images/g-logo.png"
-                                alt="Google Logo" width="20" height="20">
-                            <span>Sign up with Google</span>
-                        </a>
-                    '''
-                    st.markdown(google_register_html, unsafe_allow_html=True)
-                else:
-                    st.info("Google registration is temporarily unavailable.")
-
-    # Footer information
-    st.markdown("---")
-    st.markdown(
-        """
-        <div style='text-align: center; color: #666; font-size: 0.9em; margin-top: 2rem;'>
-            <p>🏥 MedScore Assist - Empowering Healthcare Professionals</p>
-            <p>Secure • Reliable • Professional</p>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
+            # Google Register Button
+            st.markdown('<div class="divider"><span>or sign up with</span></div>', unsafe_allow_html=True)
+            
+            register_auth_url = get_google_auth_url(mode="register")
+            google_register_html = f'''
+                <a href="{register_auth_url}" target="_self" class="google-btn">
+                    <img src="https://developers.google.com/identity/images/g-logo.png"
+                        alt="Google Logo" width="20" height="20">
+                    <span>Sign up with Google</span>
+                </a>
+            '''
+            st.markdown(google_register_html, unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        st.error("⚠️ An unexpected error occurred. Please refresh the page and try again.")
-        st.error(f"Error details: {str(e)}")
-        
-        # Clear session state on critical error
-        if st.button("🔄 Reset Application"):
-            clear_session_state()
-            st.query_params.clear()
-            st.rerun()
+    main()
