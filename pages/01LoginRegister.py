@@ -401,19 +401,20 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Google OAuth Configuration
-GOOGLE_CLIENT_ID = "your-real-client-id"
-GOOGLE_CLIENT_SECRET = "your-real-client-id"
+GOOGLE_CLIENT_ID = "207857923434-3iaocbdg54hdfi7bqnrnjmi6rocjt8al.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
 REDIRECT_URI = "http://localhost:8501/LoginRegister"
-FIREBASE_API_KEY = "your-real-client-id"
+FIREBASE_API_KEY = "AIzaSyD5l6ZiWTMDqoA7zqzSrqgQ_7uMCJAW9sM"
 
 # Initialize Firebase with Pyrebase
 firebaseConfig = {
     "apiKey": FIREBASE_API_KEY,
-    "authDomain": "your-real-client-id",
-    "databaseURL": "your-real-client-id",
-    "storageBucket": "your-real-client-id",
-    "messagingSenderId": "your-real-client-id",
-    "appId": "your-real-client-id"
+    "authDomain": "medscore-assist.firebaseapp.com",
+    "databaseURL": "https://medscore-assist-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    "projectId": "medscore-assist",
+    "storageBucket": "medscore-assist.firebasestorage.app",
+    "messagingSenderId": "207857923434",
+    "appId": "1:207857923434:web:a89b72e7ce45e36f9d2113"
 }
 
 # Initialize Firebase
