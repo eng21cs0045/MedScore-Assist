@@ -330,7 +330,7 @@ with col2:
     )
 with col3:
     if st.button("👤 Logout", key="logout"):
-        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\06_LogOut.py")
+        st.switch_page(r"pages/06_LogOut.py")
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 # ============ Top Icons ============
