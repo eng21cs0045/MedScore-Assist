@@ -26,6 +26,25 @@ st.markdown(
             button[kind="header"] {
                 display: none;
             }
+
+            .main {
+                padding: 0rem 1rem;
+            }
+            header, footer {
+                visibility: hidden;
+            }
+            .block-container {
+                padding-top: 0rem;
+                padding-bottom: 0rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .client-box {
+                background-color: #f1fdfc;
+                padding: 20px;
+                margin-bottom: 10px;
+                border-radius: 10px;
+            }
             
             /* Adjust main content to take full width when sidebar is hidden */
             .main .block-container {
@@ -33,24 +52,6 @@ st.markdown(
                 padding-right: 1rem;
                 max-width: 100%;
 
-            .main {
-            padding: 0rem 1rem;
-        }
-        header, footer {
-            visibility: hidden;
-        }
-        .block-container {
-            padding-top: 0rem;
-            padding-bottom: 0rem;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        .client-box {
-            background-color: #f1fdfc;
-            padding: 20px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-        }
             }
     </style>
     """,
