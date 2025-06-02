@@ -113,7 +113,7 @@ elif st.session_state.hypertension_form_page == "tech":
         ]
 
         X_input = np.array(row).reshape(1, -1)
-        model = load_model(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\Models\best_xgb_hypertension_model_v2.pkl")
+        model = load_model(r"Models/best_xgb_hypertension_model_v2.pkl")
         scaler = load_scaler_hypertension()
         final_score = predict_score(model, scaler, X_input)
 
@@ -161,7 +161,7 @@ elif st.session_state.hypertension_form_page == "tech":
 
         generate_report(user_email, "Hypertension Model", params, final_score, concerning)
     if col3.button("View My Reports"):
-        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\MyReports.py")
+        st.switch_page(r"pages/MyReports.py")
 # Prevent accidental reruns when run directly
 if __name__ == "__main__":
     st.stop()
