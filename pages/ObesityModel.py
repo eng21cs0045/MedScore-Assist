@@ -78,7 +78,7 @@ if st.session_state.obesity_form_page == "non_tech":
 
     col1, col2 = st.columns([0.8, 1.2])
     if col1.button("⬅️ Back to Home"):
-        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+        st.switch_page(r"pages/02LandingPage.py")
     if col2.button("Next ➡️"):
         st.session_state.obesity_form_page = "tech"
         st.rerun()
@@ -112,7 +112,7 @@ elif st.session_state.obesity_form_page == "tech":
         ]
 
         X_input = np.array(row).reshape(1, -1)
-        model = load_model(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\Models\best_xgb_obesity_model_v2.pkl")
+        model = load_model(r"Models/best_xgb_obesity_model_v2.pkl")
         scaler = load_scaler_obesity()
         final_score = predict_score(model, scaler, X_input)
 
@@ -160,7 +160,7 @@ elif st.session_state.obesity_form_page == "tech":
 
         generate_report(user_email, "Obesity Model", params, final_score, concerning)
     if col3.button("View My Reports"):
-        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\MyReports.py")
+        st.switch_page(r"pages/MyReports.py")
 # Prevent accidental reruns when run directly
 if __name__ == "__main__":
     st.stop()
