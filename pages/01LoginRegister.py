@@ -655,14 +655,25 @@ def main():
         st.session_state.error_message = None
 
     # User is already logged in - redirect to Landing Page
-    if "user" in st.session_state and not isinstance(st.session_state["user"], dict) or \
-    "user" in st.session_state and isinstance(st.session_state["user"], dict) and "error" not in st.session_state["user"]:
-        
-        user_email = st.session_state['user'].get('email', '')
-        st.success(f"✅ Welcome back, logged in as {user_email}!")
-        
-        time.sleep(3)
-        st.switch_page(r"C:\Users\My pc\Dropbox\PC\Desktop\MP_authentication_21stMay_Final\pages\02LandingPage.py")
+    # Replace the complex user check with this simpler version:
+
+    # Check if user is logged in - SIMPLIFIED
+    if "user" in st.session_state and st.session_state["user"] is not None:
+        # Check if it's a valid user object (not an error dict)
+        if isinstance(st.session_state["user"], dict) and "error" not in st.session_state["user"]:
+            user_email = st.session_state['user'].get('email', 'Unknown')
+            st.success(f"✅ Welcome back, logged in as {user_email}!")
+            
+            # Add a button to proceed manually if auto-redirect fails
+            if st.button("Continue to Dashboard"):
+                st.switch_page("pages/02LandingPage.py")  # Fixed path
+            
+            # Optional: Auto-redirect after a delay
+            time.sleep(2)
+            st.switch_page("pages/02LandingPage.py")  # Fixed path
+    
+    # Alternative: Add debugging to see what's in session state
+    st.write("Debug - Session State:", st.session_state)  # Remove this after debugging
 
     # Display error if present
     if "error_message" in st.session_state and st.session_state.error_message:
